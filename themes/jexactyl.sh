@@ -20,6 +20,85 @@ pause() {
     read -n 1 -s -r
 }
 
+install_jexactyl_theme() {
+    local THEME_NAME="$1"
+    local THEME_DIR="$2"
+    BDIR="/var/www/jexactyl"
+
+    if [ ! -d "$BDIR" ]; then
+        echo -e "  ${RED}Jexactyl panel not found at $BDIR${NC}"
+        pause
+        return
+    fi
+
+    cd "$BDIR" || return
+
+    echo -e "  ${CYAN}Installing ${THEME_NAME}...${NC}"
+
+    local LOCAL_SRC="$BASE_DIR/thame/Jexactyl/$THEME_DIR"
+    rm -rf /tmp/jexactyl-install
+
+    if [ -d "$LOCAL_SRC" ]; then
+        echo -e "  ${GREEN}Using local files from repo${NC}"
+        cp -r "$LOCAL_SRC" /tmp/jexactyl-install
+    else
+        echo -e "  ${YELLOW}Downloading from GitHub...${NC}"
+        local ARCHIVE_URL="$GITHUB_RAW/thame/Jexactyl/$THEME_DIR.tar.gz"
+        mkdir -p /tmp/jexactyl-install
+        curl -sL "$ARCHIVE_URL" | tar xz -C /tmp/jexactyl-install 2>/dev/null
+        if [ ! -d "/tmp/jexactyl-install/$THEME_DIR" ]; then
+            rm -rf /tmp/jexactyl-install
+            git clone --depth=1 "https://github.com/Jexactyl/v2-themes.git" /tmp/jexactyl-install 2>/dev/null
+        fi
+        if [ -d "/tmp/jexactyl-install/$THEME_DIR" ]; then
+            local TMP="/tmp/jexactyl-install/$THEME_DIR"
+            mkdir -p /tmp/jexactyl-install-copy
+            cp -r "$TMP"/* /tmp/jexactyl-install-copy/ 2>/dev/null
+            rm -rf /tmp/jexactyl-install
+            mv /tmp/jexactyl-install-copy /tmp/jexactyl-install
+        fi
+    fi
+
+    if [ ! -d "/tmp/jexactyl-install" ]; then
+        echo -e "  ${RED}Download failed! Falling back to CSS-only...${NC}"
+        if [ "$THEME_DIR" = "lights-out" ]; then
+            jexactyl_apply_css "lights-out" \
+"/* Lights Out Dark Theme for Jexactyl */
+:root {
+    --bg-primary: #0d1117; --bg-secondary: #161b22; --bg-card: #1c2333;
+    --text-primary: #e6edf3; --text-secondary: #8b949e;
+    --accent: #58a6ff; --border: #30363d;
+    --success: #3fb950; --warning: #d29922; --danger: #f85149;
+}
+body { background: var(--bg-primary); color: var(--text-primary); }
+.card, .modal, .box { background: var(--bg-card); border-color: var(--border); }"
+        else
+            jexactyl_apply_css "flashbang" \
+"/* Flashbang Light Theme for Jexactyl */
+:root {
+    --bg-primary: #ffffff; --bg-secondary: #f6f8fa; --bg-card: #ffffff;
+    --text-primary: #1f2328; --text-secondary: #656d76;
+    --accent: #0969da; --border: #d0d7de;
+    --success: #1a7f37; --warning: #9a6700; --danger: #cf222e;
+}
+body { background: var(--bg-primary); color: var(--text-primary); }
+.card, .modal, .box { background: var(--bg-card); border-color: var(--border); }"
+        fi
+        return
+    fi
+
+    cp -r /tmp/jexactyl-install/* "$BDIR/" 2>/dev/null
+    rm -rf /tmp/jexactyl-install
+
+    echo -e "  ${CYAN}Building assets...${NC}"
+    command -v yarn &>/dev/null || npm install -g yarn 2>/dev/null
+    yarn 2>/dev/null
+    yarn build:production 2>/dev/null
+    php artisan view:clear 2>/dev/null
+    chown -R www-data:www-data "$BDIR" 2>/dev/null
+    echo -e "  ${GREEN}${THEME_NAME} installed!${NC}"
+}
+
 jexactyl_apply_css() {
     local THEME_NAME="$1"
     local CSS_CONTENT="$2"
@@ -36,107 +115,9 @@ jexactyl_apply_css() {
     mkdir -p public/themes
     echo "$CSS_CONTENT" > "public/themes/${THEME_NAME}.css"
 
-    echo -e "  ${GREEN}Theme applied!${NC}"
+    echo -e "  ${GREEN}CSS theme applied!${NC}"
     echo -e "  ${GRAY}File: public/themes/${THEME_NAME}.css${NC}"
     echo -e "  ${GRAY}You may need to include it in your layout manually.${NC}"
-}
-
-install_lightsout() {
-    clear
-    echo -e "${YELLOW}Installing Lights Out Dark Theme...${NC}"
-    echo ""
-    BDIR="/var/www/jexactyl"
-    if [ ! -d "$BDIR" ]; then
-        echo -e "  ${RED}Jexactyl panel not found at $BDIR${NC}"
-        pause
-        return
-    fi
-
-    cd "$BDIR" || return
-
-    echo -e "  ${CYAN}Downloading Lights Out theme...${NC}"
-    rm -rf /tmp/jexactyl-themes
-    git clone --depth=1 "https://github.com/Jexactyl/v2-themes.git" /tmp/jexactyl-themes 2>/dev/null
-
-    if [ -d "/tmp/jexactyl-themes/lights-out" ]; then
-        cp -r /tmp/jexactyl-themes/lights-out/* "$BDIR/" 2>/dev/null
-        echo -e "  ${CYAN}Building assets...${NC}"
-        command -v yarn &>/dev/null || npm install -g yarn 2>/dev/null
-        yarn 2>/dev/null
-        yarn build:production 2>/dev/null
-        php artisan view:clear 2>/dev/null
-        chown -R www-data:www-data "$BDIR" 2>/dev/null
-        echo -e "  ${GREEN}Lights Out theme installed!${NC}"
-    else
-        echo -e "  ${YELLOW}Theme files not found. Trying manual CSS approach...${NC}"
-        jexactyl_apply_css "lights-out" \
-"/* Lights Out Dark Theme for Jexactyl */
-:root {
-    --bg-primary: #0d1117;
-    --bg-secondary: #161b22;
-    --bg-card: #1c2333;
-    --text-primary: #e6edf3;
-    --text-secondary: #8b949e;
-    --accent: #58a6ff;
-    --border: #30363d;
-    --success: #3fb950;
-    --warning: #d29922;
-    --danger: #f85149;
-}
-body { background: var(--bg-primary); color: var(--text-primary); }
-.card, .modal, .box { background: var(--bg-card); border-color: var(--border); }"
-    fi
-
-    rm -rf /tmp/jexactyl-themes
-}
-
-install_flashbang() {
-    clear
-    echo -e "${YELLOW}Installing Flashbang Light Theme...${NC}"
-    echo ""
-    BDIR="/var/www/jexactyl"
-    if [ ! -d "$BDIR" ]; then
-        echo -e "  ${RED}Jexactyl panel not found at $BDIR${NC}"
-        pause
-        return
-    fi
-
-    cd "$BDIR" || return
-
-    echo -e "  ${CYAN}Downloading Flashbang theme...${NC}"
-    rm -rf /tmp/jexactyl-themes
-    git clone --depth=1 "https://github.com/Jexactyl/v2-themes.git" /tmp/jexactyl-themes 2>/dev/null
-
-    if [ -d "/tmp/jexactyl-themes/flashbang" ]; then
-        cp -r /tmp/jexactyl-themes/flashbang/* "$BDIR/" 2>/dev/null
-        echo -e "  ${CYAN}Building assets...${NC}"
-        command -v yarn &>/dev/null || npm install -g yarn 2>/dev/null
-        yarn 2>/dev/null
-        yarn build:production 2>/dev/null
-        php artisan view:clear 2>/dev/null
-        chown -R www-data:www-data "$BDIR" 2>/dev/null
-        echo -e "  ${GREEN}Flashbang theme installed!${NC}"
-    else
-        echo -e "  ${YELLOW}Theme files not found. Trying manual CSS approach...${NC}"
-        jexactyl_apply_css "flashbang" \
-"/* Flashbang Light Theme for Jexactyl */
-:root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f6f8fa;
-    --bg-card: #ffffff;
-    --text-primary: #1f2328;
-    --text-secondary: #656d76;
-    --accent: #0969da;
-    --border: #d0d7de;
-    --success: #1a7f37;
-    --warning: #9a6700;
-    --danger: #cf222e;
-}
-body { background: var(--bg-primary); color: var(--text-primary); }
-.card, .modal, .box { background: var(--bg-card); border-color: var(--border); }"
-    fi
-
-    rm -rf /tmp/jexactyl-themes
 }
 
 while true; do
@@ -161,11 +142,11 @@ while true; do
 
     case $p in
         1)
-            install_lightsout
+            install_jexactyl_theme "Lights Out" "lights-out"
             pause
             ;;
         2)
-            install_flashbang
+            install_jexactyl_theme "Flashbang" "flashbang"
             pause
             ;;
         3)
