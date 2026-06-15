@@ -16,6 +16,54 @@ BINARY_NAME="${2:-catalyst-agent}"
 CONFIG_DIR="${4:-/opt/catalyst-agent}"
 SERVICE_NAME="${5:-catalyst-agent}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+WINGS_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$WINGS_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_binary() {
+    local LOCAL_BIN="$BASE_DIR/daemon/catalyst/${BINARY_NAME}"
+    if [ -f "$LOCAL_BIN" ]; then
+        cp "$LOCAL_BIN" /usr/local/bin/${BINARY_NAME}
+        chmod +x /usr/local/bin/${BINARY_NAME}
+        ok "Binary copied from local repo"
+        return 0
+    fi
+
+    local REMOTE_BIN="$GITHUB_RAW/daemon/catalyst/${BINARY_NAME}"
+    if curl -fsL -o /usr/local/bin/${BINARY_NAME} "$REMOTE_BIN"; then
+        chmod +x /usr/local/bin/${BINARY_NAME}
+        ok "Binary downloaded from repo"
+        return 0
+    fi
+
+    return 1
+}
+
+build_from_source() {
+    local SRC_DIR="$BASE_DIR/daemon/catalyst"
+    if [ -f "$SRC_DIR/catalyst-agent/Cargo.toml" ]; then
+        cd "$SRC_DIR/catalyst-agent"
+        cargo build --release
+        cp target/release/${BINARY_NAME} /usr/local/bin/${BINARY_NAME}
+        chmod +x /usr/local/bin/${BINARY_NAME}
+        ok "Agent built from local source"
+        return 0
+    fi
+
+    local TMP_BUILD="/tmp/catalyst-build"
+    if [ -d "$TMP_BUILD" ]; then
+        cd "$TMP_BUILD" && git pull
+    else
+        git clone --depth 1 https://github.com/catalystctl/catalyst.git "$TMP_BUILD"
+    fi
+    cd "$TMP_BUILD/catalyst-agent"
+    cargo build --release
+    cp target/release/${BINARY_NAME} /usr/local/bin/${BINARY_NAME}
+    chmod +x /usr/local/bin/${BINARY_NAME}
+    ok "Agent built from upstream source"
+}
+
 show_banner() {
     clear
     echo -e "${PURPLE}"
@@ -67,19 +115,9 @@ install_agent() {
     mkdir -p "$CONFIG_DIR"
     mkdir -p /var/lib/catalyst
 
-    step "Building ${BINARY_NAME} from source..."
-    if [ ! -f /usr/local/bin/${BINARY_NAME} ]; then
-        TMP_BUILD="/tmp/catalyst-build"
-        if [ ! -d "$TMP_BUILD" ]; then
-            git clone --depth 1 https://github.com/catalystctl/catalyst.git "$TMP_BUILD"
-        fi
-        cd "$TMP_BUILD/catalyst-agent"
-        cargo build --release
-        cp target/release/${BINARY_NAME} /usr/local/bin/${BINARY_NAME}
-        chmod +x /usr/local/bin/${BINARY_NAME}
-        ok "Agent binary built and installed to /usr/local/bin/${BINARY_NAME}"
-    else
-        ok "Agent binary already exists"
+    step "Getting ${BINARY_NAME} binary..."
+    if ! download_binary; then
+        build_from_source
     fi
 
     echo ""
@@ -149,20 +187,10 @@ uninstall_agent() {
 }
 
 update_agent() {
-    step "Updating ${BINARY_NAME} from source..."
-    TMP_BUILD="/tmp/catalyst-build"
-    if [ -d "$TMP_BUILD" ]; then
-        cd "$TMP_BUILD"
-        git pull
-    else
-        git clone --depth 1 https://github.com/catalystctl/catalyst.git "$TMP_BUILD"
-        cd "$TMP_BUILD"
+    step "Updating ${BINARY_NAME}..."
+    if ! download_binary; then
+        build_from_source
     fi
-    cd catalyst-agent
-    cargo build --release
-    cp target/release/${BINARY_NAME} /usr/local/bin/${BINARY_NAME}
-    chmod +x /usr/local/bin/${BINARY_NAME}
-    ok "Binary updated"
 
     step "Restarting service..."
     systemctl restart ${SERVICE_NAME}

@@ -10,6 +10,36 @@ GOLD='\033[38;5;214m'
 NC='\033[0m'
 HEADER_LINE="${GRAY}────────────────────────────────────────────────────────────${NC}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+WINGS_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$WINGS_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_binary() {
+    local ARCH=$(detect_arch)
+    local FILENAME="wings_linux_${ARCH}"
+    local LOCAL_PATH="$BASE_DIR/daemon/pelican/$FILENAME"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" /usr/local/bin/wings
+        chmod +x /usr/local/bin/wings
+        ok "Binary copied from local repo"
+        return
+    fi
+
+    local REMOTE_URL="$GITHUB_RAW/daemon/pelican/$FILENAME"
+    if curl -fsL -o /usr/local/bin/wings "$REMOTE_URL"; then
+        chmod +x /usr/local/bin/wings
+        ok "Binary downloaded from repo"
+        return
+    fi
+
+    curl -L -o /usr/local/bin/wings \
+        "https://github.com/pelican-dev/wings/releases/latest/download/$FILENAME"
+    chmod +x /usr/local/bin/wings
+    ok "Binary downloaded from upstream"
+}
+
 show_banner() {
     clear
     echo -e "${PURPLE}"
@@ -56,12 +86,7 @@ install_wings() {
     mkdir -p /etc/pelican
     mkdir -p /var/lib/pelican
 
-    step "Downloading Pelican Wings binary..."
-    ARCH=$(detect_arch)
-    curl -L -o /usr/local/bin/wings \
-        "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_${ARCH}"
-    chmod +x /usr/local/bin/wings
-    ok "Binary installed to /usr/local/bin/wings"
+    download_binary
 
     echo ""
     echo -e "  ${GOLD}Create your node in the Pelican panel first,${NC}"
@@ -125,11 +150,7 @@ uninstall_wings() {
 
 update_wings() {
     step "Updating Pelican Wings binary..."
-    ARCH=$(detect_arch)
-    curl -L -o /usr/local/bin/wings \
-        "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_${ARCH}"
-    chmod +x /usr/local/bin/wings
-    ok "Binary updated"
+    download_binary
 
     systemctl restart wings
     ok "Pelican Wings updated"

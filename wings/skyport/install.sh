@@ -17,6 +17,36 @@ REPO="${3:-skyportsh/skyportd}"
 CONFIG_DIR="${4:-/etc/skyportd}"
 SERVICE_NAME="${5:-skyportd}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+WINGS_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$WINGS_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_binary() {
+    local ARCH=$(detect_arch)
+    local FILENAME="${BINARY_NAME}-linux-${ARCH}"
+    local LOCAL_PATH="$BASE_DIR/daemon/skyport/$FILENAME"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" /usr/local/bin/${BINARY_NAME}
+        chmod +x /usr/local/bin/${BINARY_NAME}
+        ok "Binary copied from local repo"
+        return
+    fi
+
+    local REMOTE_URL="$GITHUB_RAW/daemon/skyport/$FILENAME"
+    if curl -fsL -o /usr/local/bin/${BINARY_NAME} "$REMOTE_URL"; then
+        chmod +x /usr/local/bin/${BINARY_NAME}
+        ok "Binary downloaded from repo"
+        return
+    fi
+
+    curl -L -o /usr/local/bin/${BINARY_NAME} \
+        "https://github.com/${REPO}/releases/latest/download/$FILENAME"
+    chmod +x /usr/local/bin/${BINARY_NAME}
+    ok "Binary downloaded from upstream"
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"
@@ -58,11 +88,7 @@ install_wings() {
     mkdir -p "$CONFIG_DIR/config" "$CONFIG_DIR/volumes"
 
     step "Downloading ${BINARY_NAME} binary..."
-    ARCH=$(detect_arch)
-    curl -L -o /usr/local/bin/${BINARY_NAME} \
-        "https://github.com/${REPO}/releases/latest/download/${BINARY_NAME}-linux-${ARCH}"
-    chmod +x /usr/local/bin/${BINARY_NAME}
-    ok "Binary installed to /usr/local/bin/${BINARY_NAME}"
+    download_binary
 
     echo ""
     echo -e "  ${GOLD}Create your node in the ${PANEL_NAME} panel first,${NC}"
@@ -129,11 +155,7 @@ uninstall_wings() {
 
 update_wings() {
     step "Updating ${BINARY_NAME} binary..."
-    ARCH=$(detect_arch)
-    curl -L -o /usr/local/bin/${BINARY_NAME} \
-        "https://github.com/${REPO}/releases/latest/download/${BINARY_NAME}-linux-${ARCH}"
-    chmod +x /usr/local/bin/${BINARY_NAME}
-    ok "Binary updated"
+    download_binary
 
     step "Restarting service..."
     systemctl restart ${SERVICE_NAME}

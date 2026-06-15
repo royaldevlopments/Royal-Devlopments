@@ -16,6 +16,39 @@ BINARY_NAME="${2:-hydra-daemon}"
 CONFIG_DIR="${4:-/var/www/hydra/daemon}"
 SERVICE_NAME="${5:-hydra-daemon}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+WINGS_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$WINGS_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+get_source() {
+    local LOCAL_PATH="$BASE_DIR/daemon/hydra"
+
+    if [ -f "$LOCAL_PATH/index.js" ]; then
+        mkdir -p "$CONFIG_DIR"
+        cp -r "$LOCAL_PATH/"* "$CONFIG_DIR/"
+        ok "Source copied from local repo"
+        return
+    fi
+
+    local REMOTE_TAR="$GITHUB_RAW/daemon/hydra.tar.gz"
+    if curl -fsL -o /tmp/hydra-src.tar.gz "$REMOTE_TAR"; then
+        mkdir -p "$CONFIG_DIR"
+        tar -xzf /tmp/hydra-src.tar.gz -C "$CONFIG_DIR" --strip-components=1
+        rm -f /tmp/hydra-src.tar.gz
+        ok "Source downloaded from repo"
+        return
+    fi
+
+    if [ -d "$CONFIG_DIR/.git" ]; then
+        cd "$CONFIG_DIR" && git pull
+    else
+        mkdir -p "$CONFIG_DIR"
+        git clone https://github.com/hydren-dev/HydraDAEMON.git "$CONFIG_DIR"
+    fi
+    ok "Source cloned from upstream"
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"
@@ -54,15 +87,8 @@ install_wings() {
         ok "Docker already installed"
     fi
 
-    step "Cloning ${BINARY_NAME} repository..."
-    mkdir -p "$CONFIG_DIR"
-    if [ -d "$CONFIG_DIR/.git" ]; then
-        cd "$CONFIG_DIR" && git pull
-        ok "Repository updated"
-    else
-        git clone https://github.com/hydren-dev/HydraDAEMON.git "$CONFIG_DIR"
-        ok "Repository cloned"
-    fi
+    step "Getting ${BINARY_NAME} source..."
+    get_source
 
     step "Installing npm dependencies..."
     cd "$CONFIG_DIR"
@@ -135,15 +161,10 @@ uninstall_wings() {
 
 update_wings() {
     step "Updating ${BINARY_NAME}..."
-    if [ -d "$CONFIG_DIR/.git" ]; then
-        cd "$CONFIG_DIR"
-        git pull
-        npm install
-        ok "Dependencies updated"
-    else
-        fail "Repository not found at $CONFIG_DIR"
-        exit 1
-    fi
+    get_source
+    cd "$CONFIG_DIR"
+    npm install
+    ok "Dependencies updated"
 
     step "Restarting service..."
     systemctl restart ${SERVICE_NAME}
