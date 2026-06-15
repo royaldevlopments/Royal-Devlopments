@@ -227,8 +227,26 @@ CSS
 
     echo ""
     echo -e "  ${GREEN}Theme '$THEME_NAME' created!${NC}"
-    echo -e "  ${GRAY}Path: $PTEROCA_DIR/themes/$SLUG${NC}"
-    echo -e "  ${GRAY}Activate in Admin -> Settings -> Theme Settings${NC}"
+    echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
+    echo -e "  ${WHITE}Theme structure:${NC}"
+    echo -e "  ${GRAY}  $PTEROCA_DIR/themes/$SLUG/${NC}"
+    echo -e "  ${GRAY}    ├── template.json      ${GRAY}(Theme manifest)${NC}"
+    echo -e "  ${GRAY}    └── base.html.twig     ${GRAY}(Layout template)${NC}"
+    echo -e "  ${GRAY}  $PTEROCA_DIR/public/assets/theme/$SLUG/${NC}"
+    echo -e "  ${GRAY}    ├── css/theme.css      ${GRAY}(Edit this to style your theme)${NC}"
+    echo -e "  ${GRAY}    ├── js/                ${GRAY}(Add custom JS here)${NC}"
+    echo -e "  ${GRAY}    └── img/               ${GRAY}(Add images here)${NC}"
+    echo ""
+    echo -e "  ${YELLOW}Next steps:${NC}"
+    echo -e "  ${GRAY}1.${NC} Edit ${GREEN}css/theme.css${NC} to change colors, fonts, layout"
+    echo -e "  ${GRAY}2.${NC} Edit ${GREEN}base.html.twig${NC} to customize HTML structure"
+    echo -e "  ${GRAY}3.${NC} Add more Twig files to ${GREEN}themes/$SLUG/${NC} as needed"
+    echo -e "  ${GRAY}4.${NC} Go to ${GREEN}Admin -> Settings -> Theme Settings${NC}"
+    echo -e "  ${GRAY}5.${NC} Select your theme from the dropdown"
+    echo -e "  ${GRAY}6.${NC} Click Save and reload the page"
+    echo ""
+    echo -e "  ${PURPLE}Tip:${NC} Use Chrome DevTools to inspect elements and"
+    echo -e "  ${GRAY}find the CSS classes you want to override.${NC}"
 }
 
 while true; do
