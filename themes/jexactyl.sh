@@ -9,7 +9,7 @@ NC='\033[0m'
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 BASE_DIR="$(dirname "$SCRIPT_DIR")"
-GITHUB_RAW="https://raw.githubusercontent.com/nobita329/Nobita-Cloud/main"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
 
 run_script() {
     local script="$1"

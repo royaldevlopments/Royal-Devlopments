@@ -1,24 +1,12 @@
 #!/bin/bash
-# Nobita-Cloud Installer
-# Usage: bash <(curl -s https://ptero.nobitahost.in)
+# Royal-Devlopments Installer
+# Usage: bash <(curl -s https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main/installer.sh)
 
-export GITHUB_RAW="https://raw.githubusercontent.com/nobita329/Nobita-Cloud/main"
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+export GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")" 2>/dev/null)"
 
-# Detect if running via curl pipe or locally
-if [ -z "$BASH_EXECUTION_STRING" ] && [ -t 0 ]; then
-    SCRIPT_MODE="local"
+if [ -f "$SCRIPT_DIR/menu/UI.sh" ]; then
+    bash "$SCRIPT_DIR/menu/UI.sh"
 else
-    SCRIPT_MODE="remote"
+    bash <(curl -s "$GITHUB_RAW/menu/UI.sh")
 fi
-
-run_script() {
-    local script="$1"
-    if [ "$SCRIPT_MODE" = "local" ]; then
-        bash "$SCRIPT_DIR/$script"
-    else
-        bash <(curl -s "$GITHUB_RAW/$script")
-    fi
-}
-
-bash "$SCRIPT_DIR/menu/UI.sh"

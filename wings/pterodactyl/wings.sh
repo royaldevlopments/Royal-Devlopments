@@ -14,7 +14,7 @@ NC='\033[0m'
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 WINGS_DIR="$(dirname "$SCRIPT_DIR")"
 BASE_DIR="$(dirname "$WINGS_DIR")"
-GITHUB_RAW="https://raw.githubusercontent.com/nobita329/Nobita-Cloud/main"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
 
 PANEL_NAME="$1"
 BINARY_NAME="${2:-wings}"
