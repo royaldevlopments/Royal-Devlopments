@@ -1,0 +1,1 @@
+../pterodactyl/install.sh
