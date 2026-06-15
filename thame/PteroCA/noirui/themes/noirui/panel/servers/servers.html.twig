@@ -1,0 +1,177 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block title %}| {{ 'pteroca.servers.title'|trans }}{% endblock %}
+
+{% block content %}
+    <div class="mt-4">
+        <!-- Header Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="dashboard-header rounded-3 p-4 mb-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle me-3">
+                                <i class="fas fa-server p-3 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-1 fw-bold">{{ 'pteroca.servers.title'|trans }}</h4>
+                                <p class="text-muted mb-0">{{ 'pteroca.servers.description'|trans }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="btn-group me-2" role="group">
+                                <button type="button" class="btn btn-outline-primary active" id="view-cards">
+                                    <i class="fas fa-th-large"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="view-list">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if servers|length > 0 %}
+            <div id="cards-view">
+                <div class="row">
+                    {% for server in servers %}
+                        <div class="col-12 col-md-6 col-xl-4 mb-4">
+                            {% include 'panel/servers/components/server.html.twig' %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="list-view" style="display: none;">
+                <div class="table-responsive">
+                    <table class="table datagrid text-center">
+                        <thead>
+                            <tr>
+                                <th class="pb-2">{{ 'pteroca.servers.status'|trans }}</th>
+                                <th class="pb-2">{{ 'pteroca.servers.name'|trans }}</th>
+                                <th class="pb-2">{{ 'pteroca.servers.ip_address'|trans }}</th>
+                                <th class="pb-2">{{ 'pteroca.servers.ram_memory'|trans }}</th>
+                                <th class="pb-2">{{ 'pteroca.servers.disk'|trans }}</th>
+                                <th class="pb-2">{{ 'pteroca.servers.cpu'|trans }}</th>
+                                <th class="pb-2">{{ 'pteroca.servers.valid_until'|trans }}</th>
+                                <th class="pb-2">{{ 'pteroca.servers.actions'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="placeholder-glow placeholder-wave">
+                            {% for server in servers %}
+                                {% include 'panel/servers/components/server-list.html.twig' %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-md-12">
+                    {% include 'panel/servers/components/alert.html.twig' %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block body_javascript %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewCardsBtn = document.getElementById('view-cards');
+            const viewListBtn = document.getElementById('view-list');
+            const cardsView = document.getElementById('cards-view');
+            const listView = document.getElementById('list-view');
+
+            const savedView = localStorage.getItem('servers-view') || 'cards';
+            if (savedView === 'list') {
+                switchToListView();
+            }
+
+            viewCardsBtn.addEventListener('click', function() {
+                switchToCardsView();
+                localStorage.setItem('servers-view', 'cards');
+            });
+
+            viewListBtn.addEventListener('click', function() {
+                switchToListView();
+                localStorage.setItem('servers-view', 'list');
+            });
+
+            function switchToCardsView() {
+                viewCardsBtn.classList.add('active');
+                viewListBtn.classList.remove('active');
+                cardsView.style.display = 'block';
+                listView.style.display = 'none';
+            }
+
+            function switchToListView() {
+                viewListBtn.classList.add('active');
+                viewCardsBtn.classList.remove('active');
+                cardsView.style.display = 'none';
+                listView.style.display = 'block';
+            }
+
+            const serverIds = new Set();
+            document.querySelectorAll('[data-server-id]').forEach(element => {
+                serverIds.add(element.getAttribute('data-server-id'));
+            });
+
+            serverIds.forEach(serverId => {
+                const endpointUrl = '{{ path('panel') }}/api/server/' + serverId + '/details';
+
+                fetch(endpointUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const serverElements = document.querySelectorAll(`[data-server-id="${serverId}"]`);
+                        serverElements.forEach(element => {
+                            updateServerElements(element, data);
+                        });
+                        
+                        document.querySelectorAll('.placeholder-glow').forEach(el => el.classList.remove('placeholder-glow'));
+                        document.querySelectorAll('.placeholder-wave').forEach(el => el.classList.remove('placeholder-wave'));
+                    })
+                    .catch(error => console.error('Error fetching server details:', error));
+            });
+
+            function updateServerElements(element, data, prefix = '') {
+                for (const [key, value] of Object.entries(data)) {
+                    let dataKey = prefix ? `${prefix}-${key}` : key;
+                    dataKey = dataKey.replaceAll(' ', '-').replaceAll('.', '-').toLowerCase();
+                    if (typeof value === 'object' && value !== null) {
+                        updateServerElements(element, value, dataKey);
+                    } else {
+                        const targetElement = element.querySelector(`[data-${dataKey}]`);
+                        if (targetElement) {
+                            if (dataKey === 'state') {
+                                updateServerStateBadge(targetElement, value);
+                            } else if (targetElement.hasAttribute('data-unit')) {
+                                targetElement.textContent = `${value} ${targetElement.getAttribute('data-unit')}`;
+                            } else {
+                                targetElement.textContent = value;
+                            }
+                            targetElement.classList.remove('placeholder');
+                        }
+                    }
+                }
+            }
+
+            function updateServerStateBadge(element, state) {
+                const stateConfig = {
+                    'running': { class: 'badge-success', text: '{{ 'pteroca.servers.state.running'|trans }}' },
+                    'stopped': { class: 'badge-secondary', text: '{{ 'pteroca.servers.state.stopped'|trans }}' },
+                    'starting': { class: 'badge-warning', text: '{{ 'pteroca.servers.state.starting'|trans }}' },
+                    'stopping': { class: 'badge-warning', text: '{{ 'pteroca.servers.state.stopping'|trans }}' },
+                    'offline': { class: 'badge-danger', text: '{{ 'pteroca.servers.state.offline'|trans }}' }
+                };
+
+                const config = stateConfig[state] || { class: 'badge-secondary', text: state };
+                
+                element.className = `badge ${config.class}`;
+                element.textContent = config.text;
+            }
+        });
+    </script>
+{% endblock %}

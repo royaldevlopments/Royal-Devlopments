@@ -1,0 +1,11 @@
+{
+    "template": {
+        "name": "noirui",
+        "description": "null",
+        "author": "mason",
+        "version": "1.0.0",
+        "license": "MIT",
+        "pterocaVersion": "0.6.1",
+        "phpVersion": ">=8.2"
+    }
+}

@@ -1,0 +1,18 @@
+<div class="balance-section">
+    <div class="balance-header">
+        <div>
+            <h3 class="balance-title">{{ 'pteroca.dashboard.account_balance'|trans }}</h3>
+            <p class="balance-label">{{ 'pteroca.dashboard.account_balance_description'|trans }}</p>
+        </div>
+    </div>
+    
+    <div class="balance-display">
+        <div class="balance-amount">
+            <span class="balance-value">{{ app.user.balance|number_format(2, ',', ' ')}}</span>
+            <span class="balance-currency">{{ get_currency() }}</span>
+        </div>
+        <a href="{{ path('panel', { routeName: 'recharge_balance' }) }}" class="btn-add-funds">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </a>
+    </div>
+</div>

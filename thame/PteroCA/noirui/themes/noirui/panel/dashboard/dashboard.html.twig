@@ -1,0 +1,91 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block title %}
+    | {{ 'pteroca.dashboard.title'|trans }}
+{% endblock %}
+
+{% block content %}
+    <div>
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="{{ path('panel') }}" class="breadcrumb-link">Home</a>
+                </li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item breadcrumb-item-active">
+                    <span>{{ 'pteroca.dashboard.title'|trans }}</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header Section -->
+        <h1 class="dashboard-title">{{ 'pteroca.dashboard.title'|trans }}</h1>
+        <p class="dashboard-subtitle">{{ 'pteroca.dashboard.welcome_message'|trans }}</p>
+
+        {# TOP widgets - Full width section #}
+        {% include '_partials/widget_area.html.twig' with {
+            'position': constant('App\\Core\\Enum\\WidgetPosition::TOP'),
+            'widgetContext': widgetContext,
+            'widgetRegistry': widgetRegistry,
+            'contextData': contextData
+        } %}
+
+        {# FULL_WIDTH widgets - Spanning entire row #}
+        {% include '_partials/widget_area.html.twig' with {
+            'position': constant('App\\Core\\Enum\\WidgetPosition::FULL_WIDTH'),
+            'widgetContext': widgetContext,
+            'widgetRegistry': widgetRegistry,
+            'contextData': contextData,
+            'cssClass': 'mt-2'
+        } %}
+
+        {# LEFT + RIGHT widgets - Main content area #}
+        <div class="row g-4 mt-2">
+            {# LEFT widgets - Main content (8 columns) #}
+            {% set leftWidgets = widgetRegistry.getWidgetsByPosition(
+                constant('App\\Core\\Enum\\WidgetPosition::LEFT'),
+                widgetContext
+            ) %}
+
+            {% if leftWidgets|length > 0 %}
+                <div class="col-12 col-xl-8">
+                    {% for widget in leftWidgets %}
+                        {% if widget.isVisible(widgetContext, contextData) %}
+                            <div class="mb-4">
+                                {% include widget.getTemplate() with widget.getData(widgetContext, contextData) only %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# RIGHT widgets - Sidebar (4 columns) #}
+            {% set rightWidgets = widgetRegistry.getWidgetsByPosition(
+                constant('App\\Core\\Enum\\WidgetPosition::RIGHT'),
+                widgetContext
+            ) %}
+
+            {% if rightWidgets|length > 0 %}
+                <div class="col-12 col-xl-4">
+                    {% for widget in rightWidgets %}
+                        {% if widget.isVisible(widgetContext, contextData) %}
+                            <div class="mb-4">
+                                {% include widget.getTemplate() with widget.getData(widgetContext, contextData) only %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# BOTTOM widgets - Full width section at bottom #}
+        {% include '_partials/widget_area.html.twig' with {
+            'position': constant('App\\Core\\Enum\\WidgetPosition::BOTTOM'),
+            'widgetContext': widgetContext,
+            'widgetRegistry': widgetRegistry,
+            'contextData': contextData,
+            'cssClass': 'mt-2'
+        } %}
+    </div>
+{% endblock %}

@@ -42,14 +42,33 @@ install_noirui() {
 
     cd "$PTEROCA_DIR" || return
 
-    echo -e "  ${CYAN}Downloading NoirUI Theme...${NC}"
-    rm -rf /tmp/noirui-install
-    git clone --depth=1 "https://github.com/austndoesui/NoirUI-pteroca-theme.git" /tmp/noirui-install 2>/dev/null
+    local NOIRUI_SRC="$BASE_DIR/thame/PteroCA/noirui"
+    if [ -d "$NOIRUI_SRC" ]; then
+        echo -e "  ${GREEN}Using local files from repo${NC}"
+        rm -rf /tmp/noirui-install
+        cp -r "$NOIRUI_SRC" /tmp/noirui-install
+    else
+        echo -e "  ${YELLOW}Downloading NoirUI Theme from GitHub...${NC}"
+        rm -rf /tmp/noirui-install
+        local ARCHIVE_URL="$GITHUB_RAW/thame/PteroCA/noirui.tar.gz"
+        mkdir -p /tmp/noirui-install
+        curl -sL "$ARCHIVE_URL" | tar xz -C /tmp/noirui-install 2>/dev/null
+        if [ ! -d "/tmp/noirui-install/noirui" ]; then
+            rm -rf /tmp/noirui-install
+            git clone --depth=1 "https://github.com/austndoesui/NoirUI-pteroca-theme.git" /tmp/noirui-install 2>/dev/null
+        fi
+    fi
 
-    if [ ! -d "/tmp/noirui-install" ]; then
+    if [ ! -d "/tmp/noirui-install/noirui" ] && [ ! -d "/tmp/noirui-install/themes" ]; then
         echo -e "  ${RED}Download failed!${NC}"
+        rm -rf /tmp/noirui-install
         pause
         return
+    fi
+
+    local INSTALL_DIR="/tmp/noirui-install"
+    if [ -d "$INSTALL_DIR/noirui/themes" ]; then
+        INSTALL_DIR="$INSTALL_DIR/noirui"
     fi
 
     echo -e "  ${CYAN}Backing up current theme...${NC}"
@@ -59,8 +78,10 @@ install_noirui() {
     fi
 
     echo -e "  ${CYAN}Copying theme files...${NC}"
-    cp -r /tmp/noirui-install/themes/noirui "$PTEROCA_DIR/themes/" 2>/dev/null
-    cp -r /tmp/noirui-install/public/assets/theme/noirui "$PTEROCA_DIR/public/assets/theme/" 2>/dev/null
+    cp -r "$INSTALL_DIR/themes/noirui" "$PTEROCA_DIR/themes/" 2>/dev/null
+    if [ -d "$INSTALL_DIR/public/assets/theme/noirui" ]; then
+        cp -r "$INSTALL_DIR/public/assets/theme/noirui" "$PTEROCA_DIR/public/assets/theme/" 2>/dev/null
+    fi
 
     echo -e "  ${CYAN}Setting permissions...${NC}"
     chown -R www-data:www-data "$PTEROCA_DIR/themes/noirui" 2>/dev/null
