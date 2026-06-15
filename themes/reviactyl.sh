@@ -63,59 +63,6 @@ show_designify_info() {
     echo -e "  ${GRAY}-${NC} Custom dashboard layouts"
 }
 
-apply_custom_css() {
-    clear
-    echo -e "${YELLOW}Apply Custom CSS Theme${NC}"
-    echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
-    echo ""
-
-    BDIR="/var/www/reviactyl"
-    if [ ! -d "$BDIR" ]; then
-        echo -ne "  ${CYAN}Enter Reviactyl installation path:${NC} "
-        read BDIR
-        if [ ! -d "$BDIR" ]; then
-            echo -e "  ${RED}Directory not found${NC}"
-            pause
-            return
-        fi
-    fi
-
-    mkdir -p "$BDIR/public/themes"
-
-    echo -e "  ${WHITE}Paste your custom CSS below. Press Ctrl+D when done.${NC}"
-    echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
-    echo ""
-
-    local CSS
-    CSS=$(cat)
-
-    if [ -z "$CSS" ]; then
-        echo -e "  ${RED}No CSS entered${NC}"
-        pause
-        return
-    fi
-
-    echo "$CSS" > "$BDIR/public/themes/custom.css"
-    chown -R www-data:www-data "$BDIR/public/themes/custom.css" 2>/dev/null
-
-    echo ""
-    echo -e "  ${GREEN}Custom CSS theme applied!${NC}"
-    echo -e "  ${GRAY}Saved to: $BDIR/public/themes/custom.css${NC}"
-    echo ""
-    echo -e "  ${WHITE}To activate:${NC}"
-    echo -e "  ${GRAY}1. Go to Admin Panel -> Appearance -> Designify${NC}"
-    echo -e "  ${GRAY}2. Or include in your layout template:<link>${NC}"
-    echo -e "  ${GRAY}   <link rel=\"stylesheet\" href=\"/themes/custom.css\">${NC}"
-    echo ""
-    echo -e "  ${YELLOW}Tip:${NC} Use the Designify Editor (Option 2) to preview changes live."
-
-    if [ ! -f "$BDIR/.css_backup_created" ]; then
-        cp "$BDIR/public/themes/custom.css" "$BDIR/public/themes/custom.css.bak" 2>/dev/null
-        touch "$BDIR/.css_backup_created"
-        echo -e "  ${GRAY}Backup: custom.css.bak${NC}"
-    fi
-}
-
 while true; do
     clear
     echo -e "${BLUE}"
@@ -128,37 +75,15 @@ while true; do
     echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
     echo -e "  ${GREEN}[1]${NC} Client-Side Theme Selector ${GRAY}(Info)${NC}"
     echo -e "  ${PURPLE}[2]${NC} Designify Editor ${GRAY}(CSS Customizer)${NC}"
-    echo -e "  ${YELLOW}[3]${NC} Apply Custom CSS Theme"
-    echo -e "  ${CYAN}[4]${NC} Theme Status"
     echo -e "  ${RED}[0]${NC} Back"
     echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
     echo ""
-    echo -ne "  ${CYAN}Select Option [0-4]:${NC} "
+    echo -ne "  ${CYAN}Select Option [0-2]:${NC} "
     read p
 
     case $p in
         1) show_theme_selector_info ;;
         2) show_designify_info ;;
-        3) apply_custom_css ;;
-        4)
-            clear
-            echo -e "${YELLOW}Reviactyl Theme Status${NC}"
-            echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
-            echo ""
-            BDIR="/var/www/reviactyl"
-            if [ -d "$BDIR" ]; then
-                echo -e "  ${GREEN}[INSTALLED]${NC} Reviactyl Panel"
-                echo -e "  ${GRAY}Theme system:${NC} Built-in Client-Side Theme Selector"
-                echo -e "  ${GRAY}Designify:${NC} Built-in CSS/HTML editor"
-                echo ""
-                echo -e "  ${WHITE}Reviactyl does not need external themes.${NC}"
-                echo -e "  ${WHITE}Use the Admin Panel to customize appearance.${NC}"
-            else
-                echo -e "  ${YELLOW}Reviactyl not installed yet${NC}"
-                echo -e "  ${GRAY}Install via main menu first${NC}"
-            fi
-            pause
-            ;;
         0) clear; exit ;;
         *) echo -e "  ${RED}Invalid${NC}"; sleep 1 ;;
     esac
