@@ -59,12 +59,11 @@ panel_menu() {
         echo -e "  ${GRAY}│${NC} ${PURPLE}[6]${NC} PteroCA Wings                         ${GRAY}│${NC}"
         echo -e "  ${GRAY}│${NC} ${CYAN}[7]${NC} Skyport Daemon                        ${GRAY}│${NC}"
         echo -e "  ${GRAY}│${NC} ${GREEN}[8]${NC} HydraPanel Daemon                     ${GRAY}│${NC}"
-        echo -e "  ${GRAY}│${NC} ${YELLOW}[9]${NC} PufferPanel Daemon                    ${GRAY}│${NC}"
-        echo -e "  ${GRAY}│${NC} ${PURPLE}[10]${NC} Catalyst Agent                        ${GRAY}│${NC}"
+        echo -e "  ${GRAY}│${NC} ${PURPLE}[9]${NC} Catalyst Agent                        ${GRAY}│${NC}"
         echo -e "  ${GRAY}│${NC} ${RED}[0]${NC} Back                                  ${GRAY}│${NC}"
         echo -e "  ${GRAY}└──────────────────────────────────────────────┘${NC}"
         echo ""
-        echo -ne "  ${CYAN}Select Option [0-10]:${NC} "
+        echo -ne "  ${CYAN}Select Option [0-9]:${NC} "
         read p
 
         case $p in
@@ -92,10 +91,7 @@ panel_menu() {
             8)  echo -e "  ${CYAN}-> HydraPanel Daemon...${NC}"
                 run_script "wings/hydra/wings.sh"
                 pause ;;
-            9)  echo -e "  ${CYAN}-> PufferPanel Daemon...${NC}"
-                run_script "wings/pufferpanel/wings.sh"
-                pause ;;
-            10) echo -e "  ${CYAN}-> Catalyst Agent...${NC}"
+            9)  echo -e "  ${CYAN}-> Catalyst Agent...${NC}"
                 run_script "wings/catalyst/wings.sh"
                 pause ;;
             0)  echo -e "\n  ${RED}Going back...${NC}"
