@@ -1,0 +1,15 @@
+{
+    "id": "theme-customizer",
+    "name": "Theme Customizer",
+    "author": "Boy132",
+    "version": "1.0.0",
+    "description": "Allows to customize the panel font and colors",
+    "category": "plugin",
+    "url": "https://hub.pelican.dev/plugins/theme-customizer",
+    "update_url": "https://hub.pelican.dev/plugins/theme-customizer/update.json",
+    "namespace": "Boy132\\ThemeCustomizer",
+    "class": "ThemeCustomizerPlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null
+}

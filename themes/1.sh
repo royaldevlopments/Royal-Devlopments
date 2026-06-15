@@ -41,24 +41,22 @@ while true; do
     echo -e "${NC}"
     echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
     echo -e "  ${GREEN}[1]${NC} Pterodactyl Themes"
-    echo -e "  ${PURPLE}[2]${NC} Pyrodactyl Themes"
-    echo -e "  ${YELLOW}[3]${NC} Reviactyl Themes"
-    echo -e "  ${CYAN}[4]${NC} Pelican Themes"
-    echo -e "  ${GOLD}[5]${NC} Jexactyl Themes"
-    echo -e "  ${GREEN}[6]${NC} PteroCA Themes"
+    echo -e "  ${YELLOW}[2]${NC} Reviactyl Themes"
+    echo -e "  ${CYAN}[3]${NC} Pelican Themes"
+    echo -e "  ${GOLD}[4]${NC} Jexactyl Themes"
+    echo -e "  ${GREEN}[5]${NC} PteroCA Themes"
     echo -e "  ${RED}[0]${NC} Back"
     echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
     echo ""
-    echo -ne "  ${CYAN}Select Option [0-6]:${NC} "
+    echo -ne "  ${CYAN}Select Option [0-5]:${NC} "
     read p
 
     case $p in
         1) run_script "themes/pterodactyl.sh" ;;
-        2) run_script "themes/pyrodactyl.sh" ;;
-        3) run_script "themes/reviactyl.sh" ;;
-        4) run_script "themes/pelican.sh" ;;
-        5) run_script "themes/jexactyl.sh" ;;
-        6) run_script "themes/pteroca.sh" ;;
+        2) run_script "themes/reviactyl.sh" ;;
+        3) run_script "themes/pelican.sh" ;;
+        4) run_script "themes/jexactyl.sh" ;;
+        5) run_script "themes/pteroca.sh" ;;
         0) clear; exit ;;
         *) echo -e "  ${RED}Invalid${NC}"; sleep 1 ;;
     esac

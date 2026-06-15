@@ -1,0 +1,15 @@
+{
+    "id": "alienhost-theme",
+    "name": "AlienHost Theme",
+    "author": "Killerbite95",
+    "version": "1.0.0",
+    "description": "Tema oficial de AlienHost para Pelican Panel. Colores púrpura y cyan con estilo moderno y futurista.",
+    "category": "theme",
+    "url": "https://alienhost.es",
+    "update_url": null,
+    "namespace": "AlienHost\\Theme",
+    "class": "AlienHostThemePlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null
+}

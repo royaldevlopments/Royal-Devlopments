@@ -1,0 +1,15 @@
+{
+    "id": "pterodactyl-theme",
+    "name": "Pterodactyl Theme",
+    "author": "Boy132",
+    "version": "1.0.0",
+    "description": "Pterodactyl like colors and font",
+    "category": "theme",
+    "url": "https://hub.pelican.dev/plugins/pterodactyl-theme",
+    "update_url": "https://hub.pelican.dev/plugins/pterodactyl-theme/update.json",
+    "namespace": "Boy132\\PterodactylTheme",
+    "class": "PterodactylThemePlugin",
+    "panels": null,
+    "panel_version": null,
+    "composer_packages": null
+}
