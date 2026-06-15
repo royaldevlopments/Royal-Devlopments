@@ -63,13 +63,10 @@ show_designify_info() {
     echo -e "  ${GRAY}-${NC} Custom dashboard layouts"
 }
 
-install_blueprint_theme() {
+apply_custom_css() {
     clear
-    echo -e "${YELLOW}Blueprint Theme Compatibility${NC}"
+    echo -e "${YELLOW}Apply Custom CSS Theme${NC}"
     echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
-    echo ""
-    echo -e "  ${WHITE}Reviactyl is based on Pterodactyl 1.x and supports the${NC}"
-    echo -e "  ${WHITE}Blueprint theme framework for basic CSS theming.${NC}"
     echo ""
 
     BDIR="/var/www/reviactyl"
@@ -83,34 +80,40 @@ install_blueprint_theme() {
         fi
     fi
 
-    echo -e "  ${GREEN}Available Blueprint extensions in repository:${NC}"
+    mkdir -p "$BDIR/public/themes"
+
+    echo -e "  ${WHITE}Paste your custom CSS below. Press Ctrl+D when done.${NC}"
+    echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
     echo ""
 
-    if [ -d "$BASE_DIR/thame/Extension" ]; then
-        local count=0
-        for ext in "$BASE_DIR"/thame/Extension/*; do
-            local name
-            name=$(basename "$ext" .blueprint 2>/dev/null)
-            if [ -n "$name" ]; then
-                count=$((count + 1))
-                echo -e "  ${GRAY}-${NC} $name"
-            fi
-        done
-        if [ "$count" -eq 0 ]; then
-            echo -e "  ${YELLOW}No extensions found${NC}"
-        fi
-    else
-        echo -e "  ${YELLOW}No Blueprint extensions bundled${NC}"
+    local CSS
+    CSS=$(cat)
+
+    if [ -z "$CSS" ]; then
+        echo -e "  ${RED}No CSS entered${NC}"
+        pause
+        return
     fi
 
+    echo "$CSS" > "$BDIR/public/themes/custom.css"
+    chown -R www-data:www-data "$BDIR/public/themes/custom.css" 2>/dev/null
+
     echo ""
-    echo -e "  ${YELLOW}To install Blueprint on Reviactyl:${NC}"
-    echo -e "  ${GRAY}1.${NC} Blueprint v3.5.2 (not latest) is required"
-    echo -e "  ${GRAY}2.${NC} Download from: github.com/BlueprintFramework/framework"
-    echo -e "  ${GRAY}3.${NC} Follow normal Blueprint installation for Pterodactyl"
+    echo -e "  ${GREEN}Custom CSS theme applied!${NC}"
+    echo -e "  ${GRAY}Saved to: $BDIR/public/themes/custom.css${NC}"
     echo ""
-    echo -e "  ${RED}WARNING:${NC} Blueprint compatibility with Reviactyl is NOT guaranteed."
-    echo -e "  ${GRAY}Some extensions may not work properly. Backup first!${NC}"
+    echo -e "  ${WHITE}To activate:${NC}"
+    echo -e "  ${GRAY}1. Go to Admin Panel -> Appearance -> Designify${NC}"
+    echo -e "  ${GRAY}2. Or include in your layout template:<link>${NC}"
+    echo -e "  ${GRAY}   <link rel=\"stylesheet\" href=\"/themes/custom.css\">${NC}"
+    echo ""
+    echo -e "  ${YELLOW}Tip:${NC} Use the Designify Editor (Option 2) to preview changes live."
+
+    if [ ! -f "$BDIR/.css_backup_created" ]; then
+        cp "$BDIR/public/themes/custom.css" "$BDIR/public/themes/custom.css.bak" 2>/dev/null
+        touch "$BDIR/.css_backup_created"
+        echo -e "  ${GRAY}Backup: custom.css.bak${NC}"
+    fi
 }
 
 while true; do
@@ -125,7 +128,7 @@ while true; do
     echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
     echo -e "  ${GREEN}[1]${NC} Client-Side Theme Selector ${GRAY}(Info)${NC}"
     echo -e "  ${PURPLE}[2]${NC} Designify Editor ${GRAY}(CSS Customizer)${NC}"
-    echo -e "  ${YELLOW}[3]${NC} Blueprint Theme Compatibility"
+    echo -e "  ${YELLOW}[3]${NC} Apply Custom CSS Theme"
     echo -e "  ${CYAN}[4]${NC} Theme Status"
     echo -e "  ${RED}[0]${NC} Back"
     echo -e "  ${GRAY}──────────────────────────────────────────────${NC}"
@@ -136,7 +139,7 @@ while true; do
     case $p in
         1) show_theme_selector_info ;;
         2) show_designify_info ;;
-        3) install_blueprint_theme ;;
+        3) apply_custom_css ;;
         4)
             clear
             echo -e "${YELLOW}Reviactyl Theme Status${NC}"
