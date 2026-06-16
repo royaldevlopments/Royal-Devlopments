@@ -86,15 +86,12 @@ if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; 
     echo -e " ${DG}└─ Package          :${NC} ${G}Royal Cloud Installer${NC}" ; sleep 0.5
 
     echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
-    echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 3 SECONDS ✦✦✦${NC}\n"
+    echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 10 SECONDS ✦✦✦${NC}\n"
 
-    echo -ne " ${W}Initiating in ${R}3${NC} " ; sleep 1
-    echo -ne "${R}●${NC} " ; sleep 1
-    echo -ne "${R}2${NC} " ; sleep 1
-    echo -ne "${R}●${NC} " ; sleep 1
-    echo -ne "${R}1${NC} " ; sleep 1
-    echo -ne "${R}●${NC}"
-    sleep 0.5
+    echo -ne " ${W}Initiating in${NC}"
+    for i in 10 9 8 7 6 5 4 3 2 1; do
+        echo -ne " ${R}$i${NC} " ; sleep 0.8
+    done
     echo -e "\n"
 
     bash "$payload"
