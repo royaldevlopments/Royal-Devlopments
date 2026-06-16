@@ -74,38 +74,29 @@ fi
 
 echo -e "\n ${Y}[2/2] PAYLOAD ACQUISITION${NC}"
 sleep 0.5
-echo -ne " ${DG}├─ Locating Installer...${NC} "
+echo -ne " ${DG}├─ Fetching Installer...${NC} "
 sleep 0.8
 
-UPLINK_DIR="$(dirname "$(readlink -f "$0")" 2>/dev/null || echo "$(pwd)")"
+payload="$(mktemp)"
+trap "rm -f $payload" EXIT
 
-if [ -f "$UPLINK_DIR/installer.sh" ]; then
-    echo -e "${G}LOCAL${NC} ${P}✦${NC}" ; sleep 0.4
-    payload="$UPLINK_DIR/installer.sh"
+if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; then
+    echo -e "${G}ACQUIRED${NC} ${P}✦${NC}" ; sleep 0.4
+    echo -e " ${DG}└─ Package          :${NC} ${G}Royal Dev Installer${NC}" ; sleep 0.5
+
+    echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
+    echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 10 SECONDS ✦✦✦${NC}\n"
+
+    for i in 10 9 8 7 6 5 4 3 2 1; do
+        printf "\r ${W}Initiating in ${R}%2d${NC} " "$i" > /dev/tty
+        sleep 1
+    done
+    echo -e "\n" > /dev/tty
+
+    bash "$payload"
 else
-    payload="$(mktemp)"
-    trap "rm -f $payload" EXIT
-    echo -e "${G}FETCHING${NC}" ; sleep 0.3
-    echo -ne " ${DG}├─ Downloading from GitHub...${NC} "
-    if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; then
-        echo -e "${G}ACQUIRED${NC} ${P}✦${NC}" ; sleep 0.3
-    else
-        echo -e "${R}FAILED${NC}"
-        echo -e " ${DG}└─ Error:${NC} ${R}Could not reach GitHub Raw${NC}"
-        echo -e "\n ${R}[!] CRITICAL:${NC} Uplink handshake failed. Check internet connection."
-        exit 1
-    fi
+    echo -e "${R}FAILED${NC}"
+    echo -e " ${DG}└─ Error:${NC} ${R}Could not reach GitHub Raw${NC}"
+    echo -e "\n ${R}[!] CRITICAL:${NC} Uplink handshake failed. Check internet connection."
+    exit 1
 fi
-
-echo -e " ${DG}└─ Package          :${NC} ${G}Royal Dev Installer${NC}" ; sleep 0.5
-
-echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
-echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 10 SECONDS ✦✦✦${NC}\n"
-
-for i in 10 9 8 7 6 5 4 3 2 1; do
-    printf "\r ${W}Initiating in ${R}%2d${NC} " "$i" > /dev/tty
-    sleep 1
-done
-echo -e "\n" > /dev/tty
-
-bash "$payload"
