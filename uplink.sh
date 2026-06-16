@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==========================================================
-# ROYAL CLOUD SYSTEM | OBSIDIAN UPLINK
+# ROYAL DEVELOPMENTS | OBSIDIAN UPLINK
 # ==========================================================
 set -euo pipefail
 
@@ -39,7 +39,7 @@ EOF
     echo -e "${NC}"
 
     echo -e "${VIOLET}╔══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${VIOLET}║${NC}               ${P}✦  ROYAL CLOUD UPLINK ${NEON}— ${Y}OBSIDIAN ENTERPRISE${NC}               ${VIOLET}║${NC}"
+    echo -e "${VIOLET}║${NC}          ${P}✦  ROYAL DEVELOPMENTS UPLINK ${NEON}— ${Y}OBSIDIAN ENTERPRISE${NC}           ${VIOLET}║${NC}"
     echo -e "${VIOLET}║${NC}               ${DG}v1.0${NC} ${W}|${NC} ${G}SECURE HYPER-VISUAL${NC} ${W}|${NC} ${DG}$(date +"%Y-%m-%d %H:%M:%S")${NC}     ${VIOLET}║${NC}"
     echo -e "${VIOLET}╚══════════════════════════════════════════════════════════════════════════════╝${NC}"
 
@@ -86,7 +86,7 @@ trap "rm -f $payload" EXIT
 
 if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; then
     echo -e "${G}ACQUIRED${NC} ${P}✦${NC}" ; sleep 0.4
-    echo -e " ${DG}└─ Package          :${NC} ${G}Royal Cloud Installer${NC}" ; sleep 0.5
+    echo -e " ${DG}└─ Package          :${NC} ${G}Royal Dev Installer${NC}" ; sleep 0.5
 
     echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
     echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 10 SECONDS ✦✦✦${NC}\n"
