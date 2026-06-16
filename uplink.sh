@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==========================================================
-# ROYAL DEVELOPMENTS | OBSIDIAN UPLINK
+# ROYAL DEVELOPMENTS | OBSIDIAN UPLINK v1.1
 # ==========================================================
 set -euo pipefail
 
