@@ -28,19 +28,36 @@ HOSTNAME="$(hostname)"
 render_header() {
     clear
     echo -e "${C}"
-    cat << "EOF"
- █████  █     █    █    █     █ ██████  █     █    █    
-█     █ █     █   █ █   █     █ █     █  █   █    █ █   
-█       █     █  █   █  █     █ █     █   █ █    █   █  
- █████  ███████ █     █ █     █ ██████     █    █     █ 
-      █ █     █ ███████ █     █ █   █      █    ███████ 
-█     █ █     █ █     █ █     █ █    █     █    █     █ 
- █████  █     █ █     █  █████  █     █    █    █     █ 
-EOF
+    local WIDTH=$(tput cols 2>/dev/null || echo 80)
+    if [ "$WIDTH" -ge 56 ]; then
+        echo -e " █████  █     █    █    █     █ ██████  █     █    █    "
+        echo -e "█     █ █     █   █ █   █     █ █     █  █   █    █ █   "
+        echo -e "█       █     █  █   █  █     █ █     █   █ █    █   █  "
+        echo -e " █████  ███████ █     █ █     █ ██████     █    █     █ "
+        echo -e "      █ █     █ ███████ █     █ █   █      █    ███████ "
+        echo -e "█     █ █     █ █     █ █     █ █    █     █    █     █ "
+        echo -e " █████  █     █ █     █  █████  █     █    █    █     █ "
+    elif [ "$WIDTH" -ge 40 ]; then
+        echo -e " █████  █     █    █    █     █ ██████  "
+        echo -e "█     █ █     █   █ █   █     █ █     █ "
+        echo -e "█       █     █  █   █  █     █ █     █ "
+        echo -e " █████  ███████ █     █ █     █ ██████  "
+        echo -e "      █ █     █ ███████ █     █ █   █   "
+        echo -e "█     █ █     █ █     █ █     █ █    █  "
+        echo -e " █████  █     █ █     █  █████  █     █ "
+    else
+        echo -e " █████  █     █ "
+        echo -e "█     █ █     █ "
+        echo -e "█       █     █ "
+        echo -e " █████  ███████ "
+        echo -e "      █ █     █ "
+        echo -e "█     █ █     █ "
+        echo -e " █████  █     █ "
+    fi
     echo -e "${NC}"
 
     echo -e "${VIOLET}╔══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${VIOLET}║${NC}        ${P}✦  ROYAL DEVELOPMENTS UPLINK ${NEON}— ${Y}OBSIDIAN ENTERPRISE${NC}             ${VIOLET}║${NC}"
+    echo -e "${VIOLET}║${NC}        ${P}✦  SHAURYA UPLINK ${NEON}— ${Y}OBSIDIAN ENTERPRISE${NC}                          ${VIOLET}║${NC}"
     echo -e "${VIOLET}║${NC}             ${DG}v1.0${NC} ${W}|${NC} ${G}SECURE HYPER-VISUAL${NC} ${W}|${NC} ${DG}$(date +"%Y-%m-%d %H:%M:%S")${NC}       ${VIOLET}║${NC}"
     echo -e "${VIOLET}╚══════════════════════════════════════════════════════════════════════════════╝${NC}"
 
