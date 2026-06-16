@@ -41,26 +41,32 @@ EOF
     echo -e "${VIOLET}╚══════════════════════════════════════════════════════════════════════════════╝${NC}"
 
     echo -e "\n${Y}                  ✦✦✦ UPLINK PROTOCOL ACTIVATED ✦✦✦${NC}\n"
+    sleep 1.5
 }
 
 render_header
 
 # --- NETWORK DIAGNOSTICS ---
 echo -e " ${C}◉ SYSTEM DIAGNOSTICS${NC}"
-echo -e " ${DG}├─ Hostname          :${NC} ${W}$HOSTNAME${NC}"
-echo -e " ${DG}├─ Public IP         :${NC} ${W}$IP${NC}"
-echo -e " ${DG}├─ OS                :${NC} ${W}$(cat /etc/os-release 2>/dev/null | grep -w PRETTY_NAME | cut -d= -f2 | tr -d '"')${NC}"
-echo -e " ${DG}├─ Kernel            :${NC} ${W}$(uname -r)${NC}"
-echo -e " ${DG}├─ Uplink Source     :${NC} ${W}GitHub Raw${NC}"
-echo -e " ${DG}└─ Security          :${NC} ${G}SSL/TLS ${P}✦${NC}"
+sleep 0.4
+echo -e " ${DG}├─ Hostname          :${NC} ${W}$HOSTNAME${NC}" ; sleep 0.3
+echo -e " ${DG}├─ Public IP         :${NC} ${W}$IP${NC}" ; sleep 0.3
+echo -e " ${DG}├─ OS                :${NC} ${W}$(cat /etc/os-release 2>/dev/null | grep -w PRETTY_NAME | cut -d= -f2 | tr -d '"')${NC}" ; sleep 0.3
+echo -e " ${DG}├─ Kernel            :${NC} ${W}$(uname -r)${NC}" ; sleep 0.3
+echo -e " ${DG}├─ Uplink Source     :${NC} ${W}GitHub Raw${NC}" ; sleep 0.3
+echo -e " ${DG}└─ Security          :${NC} ${G}SSL/TLS ${P}✦${NC}" ; sleep 0.5
 echo -e "${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
+sleep 0.8
 
 # --- CONNECTION SEQUENCE ---
 echo -e "\n ${Y}[1/2] CONNECTION SEQUENCE${NC}"
+sleep 0.5
 echo -ne " ${DG}├─ Resolving Uplink...${NC} "
+sleep 0.8
 
 if command -v curl &>/dev/null; then
     echo -e "${G}RESOLVED${NC} ${P}✓${NC}"
+    sleep 0.5
 else
     echo -e "${R}FAILED${NC}"
     echo -e " ${DG}└─ Error:${NC} ${R}curl not found${NC}"
@@ -68,21 +74,27 @@ else
 fi
 
 echo -e "\n ${Y}[2/2] PAYLOAD ACQUISITION${NC}"
+sleep 0.5
 echo -ne " ${DG}├─ Fetching Installer...${NC} "
+sleep 0.8
 
 payload="$(mktemp)"
 trap "rm -f $payload" EXIT
 
 if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; then
-    echo -e "${G}ACQUIRED${NC} ${P}✦${NC}"
-    echo -e " ${DG}└─ Package          :${NC} ${G}Royal Cloud Installer${NC}"
+    echo -e "${G}ACQUIRED${NC} ${P}✦${NC}" ; sleep 0.4
+    echo -e " ${DG}└─ Package          :${NC} ${G}Royal Cloud Installer${NC}" ; sleep 0.5
 
     echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
-    echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 1 SECOND ✦✦✦${NC}\n"
+    echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 3 SECONDS ✦✦✦${NC}\n"
 
-    echo -ne " ${W}Initiating in ${R}1${NC} "
+    echo -ne " ${W}Initiating in ${R}3${NC} " ; sleep 1
+    echo -ne "${R}●${NC} " ; sleep 1
+    echo -ne "${R}2${NC} " ; sleep 1
+    echo -ne "${R}●${NC} " ; sleep 1
+    echo -ne "${R}1${NC} " ; sleep 1
     echo -ne "${R}●${NC}"
-    sleep 1
+    sleep 0.5
     echo -e "\n"
 
     bash "$payload"
