@@ -28,25 +28,10 @@ HOSTNAME="$(hostname)"
 render_header() {
     clear
     echo -e "${C}"
-    local WIDTH=$(tput cols 2>/dev/null || echo 80)
-    if [ "$WIDTH" -ge 56 ]; then
-        echo -e " █████  █     █    █    █     █ ██████  █     █    █    "
-        echo -e "█     █ █     █   █ █   █     █ █     █  █   █    █ █   "
-        echo -e "█       █     █  █   █  █     █ █     █   █ █    █   █  "
-        echo -e " █████  ███████ █     █ █     █ ██████     █    █     █ "
-        echo -e "      █ █     █ ███████ █     █ █   █      █    ███████ "
-        echo -e "█     █ █     █ █     █ █     █ █    █     █    █     █ "
-        echo -e " █████  █     █ █     █  █████  █     █    █    █     █ "
-    elif [ "$WIDTH" -ge 44 ]; then
-        echo -e " ____  _   _    _   _   _ ______   __ _    "
-        echo -e "/ ___|| | | |  / \ | | | |  _ \ \ / // \   "
-        echo -e "\___ \| |_| | / _ \| | | | |_) \ V // _ \  "
-        echo -e " ___) |  _  |/ ___ \ |_| |  _ < | |/ ___ \ "
-        echo -e "|____/|_| |_/_/   \_\___/|_| \_\|_/_/   \_\\"
-    else
-        echo -e " ▄▀▀ █░█ ▄▀█ █░█ █▀█ █▄█ ▄▀█"
-        echo -e " ▄██ █▀█ █▀█ █▄█ █▀▄ ░█░ █▀█"
-    fi
+    echo -e "▛▀▖▞▀▖▌ ▌▞▀▖▌   ▛▀▖▛▀▘▌ ▌▛▀▘▌  ▞▀▖▛▀▖▙▗▌▛▀▘▙ ▌▀▛▘▞▀▖"
+    echo -e "▙▄▘▌ ▌▝▞ ▙▄▌▌   ▌ ▌▙▄ ▚▗▘▙▄ ▌  ▌ ▌▙▄▘▌▘▌▙▄ ▌▌▌ ▌ ▚▄ "
+    echo -e "▌▚ ▌ ▌ ▌ ▌ ▌▌   ▌ ▌▌  ▝▞ ▌  ▌  ▌ ▌▌  ▌ ▌▌  ▌▝▌ ▌ ▖ ▌"
+    echo -e "▘ ▘▝▀  ▘ ▘ ▘▀▀▘ ▀▀ ▀▀▘ ▘ ▀▀▘▀▀▘▝▀ ▘  ▘ ▘▀▀▘▘ ▘ ▘ ▝▀"
     echo -e "${NC}"
 
     echo -e "${VIOLET}╔══════════════════════════════════════════════════════════════════════════════╗${NC}"
@@ -89,29 +74,38 @@ fi
 
 echo -e "\n ${Y}[2/2] PAYLOAD ACQUISITION${NC}"
 sleep 0.5
-echo -ne " ${DG}├─ Fetching Installer...${NC} "
+echo -ne " ${DG}├─ Locating Installer...${NC} "
 sleep 0.8
 
-payload="$(mktemp)"
-trap "rm -f $payload" EXIT
+UPLINK_DIR="$(dirname "$(readlink -f "$0")" 2>/dev/null || echo "$(pwd)")"
 
-if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; then
-    echo -e "${G}ACQUIRED${NC} ${P}✦${NC}" ; sleep 0.4
-    echo -e " ${DG}└─ Package          :${NC} ${G}Royal Dev Installer${NC}" ; sleep 0.5
-
-    echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
-    echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 10 SECONDS ✦✦✦${NC}\n"
-
-    for i in 10 9 8 7 6 5 4 3 2 1; do
-        printf "\r ${W}Initiating in ${R}%2d${NC} " "$i" > /dev/tty
-        sleep 1
-    done
-    echo -e "\n" > /dev/tty
-
-    bash "$payload"
+if [ -f "$UPLINK_DIR/installer.sh" ]; then
+    echo -e "${G}LOCAL${NC} ${P}✦${NC}" ; sleep 0.4
+    payload="$UPLINK_DIR/installer.sh"
 else
-    echo -e "${R}FAILED${NC}"
-    echo -e " ${DG}└─ Error:${NC} ${R}Could not reach GitHub Raw${NC}"
-    echo -e "\n ${R}[!] CRITICAL:${NC} Uplink handshake failed. Check internet connection."
-    exit 1
+    payload="$(mktemp)"
+    trap "rm -f $payload" EXIT
+    echo -e "${G}FETCHING${NC}" ; sleep 0.3
+    echo -ne " ${DG}├─ Downloading from GitHub...${NC} "
+    if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; then
+        echo -e "${G}ACQUIRED${NC} ${P}✦${NC}" ; sleep 0.3
+    else
+        echo -e "${R}FAILED${NC}"
+        echo -e " ${DG}└─ Error:${NC} ${R}Could not reach GitHub Raw${NC}"
+        echo -e "\n ${R}[!] CRITICAL:${NC} Uplink handshake failed. Check internet connection."
+        exit 1
+    fi
 fi
+
+echo -e " ${DG}└─ Package          :${NC} ${G}Royal Dev Installer${NC}" ; sleep 0.5
+
+echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
+echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 10 SECONDS ✦✦✦${NC}\n"
+
+for i in 10 9 8 7 6 5 4 3 2 1; do
+    printf "\r ${W}Initiating in ${R}%2d${NC} " "$i" > /dev/tty
+    sleep 1
+done
+echo -e "\n" > /dev/tty
+
+bash "$payload"

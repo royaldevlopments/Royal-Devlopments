@@ -44,28 +44,11 @@ render_ui() {
     echo -e " ${B_BLUE}${NC}${BG_SHADE}${W} $CURRENT_HOST ${NC}${B_BLUE}${NC}  ${B_PURPLE}${NC}${BG_SHADE}${W} $UPT ${NC}${B_PURPLE}${NC}  ${B_GREEN}${NC}${BG_SHADE}${W} $DISK ${NC}${B_GREEN}${NC}  ${B_CYAN}${NC}${BG_SHADE}${W} CPU ${CPU}% RAM ${RAM}%${NC}${B_CYAN}${NC}"
     echo ""
 
-    local WIDTH=$(tput cols 2>/dev/null || echo 80)
-    if [ "$WIDTH" -ge 139 ]; then
-        echo -e "${B_CYAN}██████  ███████ █     █    █    █          ██████  ███████ █     █ ███████ █       ███████ ██████  █     █ ███████ █     █ ███████  █████  ${NC}"
-        echo -e "${B_CYAN}█     █ █     █  █   █    █ █   █          █     █ █       █     █ █       █       █     █ █     █ ██   ██ █       ██    █    █    █     █ ${NC}"
-        echo -e "${B_PURPLE}█     █ █     █   █ █    █   █  █          █     █ █       █     █ █       █       █     █ █     █ █ █ █ █ █       █ █   █    █    █       ${NC}"
-        echo -e "${B_PURPLE}██████  █     █    █    █     █ █          █     █ █████   █     █ █████   █       █     █ ██████  █  █  █ █████   █  █  █    █     █████  ${NC}"
-        echo -e "${GOLD}█   █   █     █    █    ███████ █          █     █ █        █   █  █       █       █     █ █       █     █ █       █   █ █    █          █ ${NC}"
-        echo -e "${GOLD}█    █  █     █    █    █     █ █          █     █ █         █ █   █       █       █     █ █       █     █ █       █    ██    █    █     █ ${NC}"
-        echo -e "${B_CYAN}█     █ ███████    █    █     █ ███████    ██████  ███████    █    ███████ ███████ ███████ █       █     █ ███████ █     █    █     █████  ${NC}"
-        echo -e "${G}ROYAL DEVELOPMENTS — OBSIDIAN NEXT GEN${NC}"
-    elif [ "$WIDTH" -ge 106 ]; then
-        echo -e "${B_CYAN} ____   _____   __ _    _       ____  _______     _______ _     ___  ____  __  __ _____ _   _ _____ ____  ${NC}"
-        echo -e "${B_CYAN}|  _ \ / _ \ \ / // \  | |     |  _ \| ____\ \   / / ____| |   / _ \|  _ \|  \/  | ____| \ | |_   _/ ___| ${NC}"
-        echo -e "${B_PURPLE}| |_) | | | \ V // _ \ | |     | | | |  _|  \ \ / /|  _| | |  | | | | |_) | |\/| |  _| |  \| | | | \___ \ ${NC}"
-        echo -e "${B_PURPLE}|  _ <| |_| || |/ ___ \| |___  | |_| | |___  \ V / | |___| |__| |_| |  __/| |  | | |___| |\  | | |  ___) |${NC}"
-        echo -e "${GOLD}|_| \_\\___/ |_/_/   \_\_____| |____/|_____|  \_/  |_____|_____\___/|_|   |_|  |_|_____|_| \_| |_| |____/ ${NC}"
-        echo -e "${G}ROYAL DEVELOPMENTS — OBSIDIAN NEXT GEN${NC}"
-    else
-        echo -e "${B_CYAN} █▀█ █▀█ █▄█ ▄▀█ █░░  █▀▄ █▀▀ █░█ █▀▀ █░░ █▀█ █▀█ █▄░▄█ █▀▀ █▄░█ ▀█▀ ▄▀▀${NC}"
-        echo -e "${B_CYAN} █▀▄ █▄█ ░█░ █▀█ █▄▄  █▄▀ ██▄ ▀▄▀ ██▄ █▄▄ █▄█ █▀▀ █░▀░█ ██▄ █░▀█ ░█░ ▄██${NC}"
-        echo -e "${G}ROYAL DEVELOPMENTS — OBSIDIAN NEXT GEN${NC}"
-    fi
+    echo -e "${B_CYAN}▛▀▖▞▀▖▌ ▌▞▀▖▌   ▛▀▖▛▀▘▌ ▌▛▀▘▌  ▞▀▖▛▀▖▙▗▌▛▀▘▙ ▌▀▛▘▞▀▖${NC}"
+    echo -e "${B_CYAN}▙▄▘▌ ▌▝▞ ▙▄▌▌   ▌ ▌▙▄ ▚▗▘▙▄ ▌  ▌ ▌▙▄▘▌▘▌▙▄ ▌▌▌ ▌ ▚▄ ${NC}"
+    echo -e "${B_CYAN}▌▚ ▌ ▌ ▌ ▌ ▌▌   ▌ ▌▌  ▝▞ ▌  ▌  ▌ ▌▌  ▌ ▌▌  ▌▝▌ ▌ ▖ ▌${NC}"
+    echo -e "${B_CYAN}▘ ▘▝▀  ▘ ▘ ▘▀▀▘ ▀▀ ▀▀▘ ▘ ▀▀▘▀▀▘▝▀ ▘  ▘ ▘▀▀▘▘ ▘ ▘ ▝▀${NC}"
+    echo -e "${G}ROYAL DEVELOPMENTS — OBSIDIAN NEXT GEN${NC}"
 
     echo -e " ${G}────────────────────────────────────────────────────────────────────────────────${NC}"
     echo ""
