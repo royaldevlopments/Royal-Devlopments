@@ -12,6 +12,34 @@ HEADER_LINE="${GRAY}────────────────────
 GITHUB_REPO="FOSSBilling/FOSSBilling"
 PHP_VERSION="8.3"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="fossbilling.zip"
+    local LOCAL_PATH="$BASE_DIR/src/fossbilling/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" ./fossbilling.zip
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/fossbilling/$SRC_FILE" -o fossbilling.zip 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Trying upstream release...${NC}"
+    local DL_URL
+    DL_URL=$(fetch_latest_url) || return 1
+    echo -e "  ${GRAY}Download URL: ${WHITE}$DL_URL${NC}"
+    wget -qO fossbilling.zip "$DL_URL"
+}
+
 show_banner() {
     clear
     echo -e "${GOLD}"
@@ -82,16 +110,10 @@ apt update
 
 apt install -y php${PHP_VERSION} php${PHP_VERSION}-{cli,fpm,common,mysql,mbstring,bcmath,xml,zip,curl,gd,intl,simplexml} mariadb-server nginx
 
-step "Downloading latest FOSSBilling release..."
-DL_URL=$(fetch_latest_url) || {
-    echo -e "  ${RED}Failed to fetch latest release URL.${NC}"
-    exit 1
-}
-echo -e "  ${GRAY}Download URL: ${WHITE}$DL_URL${NC}"
-
+step "Downloading FOSSBilling..."
 mkdir -p /var/www/fossbilling
 cd /var/www/fossbilling
-wget -qO fossbilling.zip "$DL_URL"
+download_src || exit 1
 unzip -q fossbilling.zip
 rm fossbilling.zip
 

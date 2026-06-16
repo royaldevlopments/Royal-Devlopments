@@ -12,6 +12,30 @@ HEADER_LINE="${GRAY}────────────────────
 GITHUB_REPO="Ctrlpanel-gg/panel"
 PHP_VERSION="8.3"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="ctrlpanel.tar.gz"
+    local LOCAL_PATH="$BASE_DIR/src/ctrlpanel/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" ./ctrlpanel.tar.gz
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/ctrlpanel/$SRC_FILE" -o ctrlpanel.tar.gz 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    return 1
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"
@@ -118,15 +142,16 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt install -y nodejs
 npm install -g yarn
 
-if [[ "$version_PANEL" == "latest" ]]; then
-    step "Cloning latest release..."
-    git clone --depth 1 https://github.com/Ctrlpanel-gg/panel.git /var/www/ctrlpanel
-else
-    step "Cloning panel version $version_PANEL..."
-    git clone --depth 1 --branch "$version_PANEL" https://github.com/Ctrlpanel-gg/panel.git /var/www/ctrlpanel
-fi
-
+step "Downloading CtrlPanel source..."
+mkdir -p /var/www/ctrlpanel
 cd /var/www/ctrlpanel
+if ! download_src; then
+    if [[ "$version_PANEL" == "latest" ]]; then
+        git clone --depth 1 https://github.com/Ctrlpanel-gg/panel.git /var/www/ctrlpanel
+    else
+        git clone --depth 1 --branch "$version_PANEL" https://github.com/Ctrlpanel-gg/panel.git /var/www/ctrlpanel
+    fi
+fi
 chmod -R 755 storage/* bootstrap/cache/
 
 DB_NAME=ctrlpanel; DB_USER=ctrlpanel; DB_PASS=yourPassword

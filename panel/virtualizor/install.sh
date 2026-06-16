@@ -10,6 +10,31 @@ GOLD='\033[38;5;214m'
 NC='\033[0m'
 HEADER_LINE="${GRAY}────────────────────────────────────────────────────────────${NC}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="install.sh"
+    local LOCAL_PATH="$BASE_DIR/src/virtualizor/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" /root/install
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/virtualizor/$SRC_FILE" -o /root/install 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Trying upstream...${NC}"
+    wget -qN https://www.virtualizor.com/install -O /root/install
+}
+
 show_banner() {
     clear
     echo -e "${PURPLE}"
@@ -41,7 +66,7 @@ echo -e "${HEADER_LINE}"
 
 step "Downloading Virtualizor installer..."
 cd /root
-wget -qN https://www.virtualizor.com/install
+download_src
 
 step "Running Virtualizor installer..."
 echo -e "  ${GOLD}Follow the interactive prompts to complete installation.${NC}"

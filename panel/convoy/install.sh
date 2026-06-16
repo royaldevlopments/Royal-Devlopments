@@ -10,6 +10,30 @@ GOLD='\033[38;5;214m'
 NC='\033[0m'
 HEADER_LINE="${GRAY}────────────────────────────────────────────────────────────${NC}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="convoy.tar.gz"
+    local LOCAL_PATH="$BASE_DIR/src/convoy/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" ./convoy.tar.gz
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/convoy/$SRC_FILE" -o convoy.tar.gz 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    return 1
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"
@@ -56,7 +80,12 @@ if [ -d "/opt/convoy/panel" ]; then
     echo -e "  ${GOLD}ConvoyPanel already cloned, pulling latest...${NC}"
     cd /opt/convoy/panel && git pull
 else
-    git clone https://github.com/ConvoyPanel/panel.git .
+    if ! download_src; then
+        git clone https://github.com/ConvoyPanel/panel.git .
+    else
+        tar -xzf convoy.tar.gz
+        rm -f convoy.tar.gz
+    fi
 fi
 
 step "Configuring environment..."

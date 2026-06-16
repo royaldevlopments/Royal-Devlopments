@@ -11,6 +11,32 @@ NC='\033[0m'
 HEADER_LINE="${GRAY}────────────────────────────────────────────────────────────${NC}"
 INSTALL_DIR="/var/www/hydra"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="hydrapanel.tar.gz"
+    local LOCAL_PATH="$BASE_DIR/src/hydra/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" "./$SRC_FILE"
+        ok "Copied from local repo"
+        tar -xzf "$SRC_FILE"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/hydra/$SRC_FILE" -o "$SRC_FILE" 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        tar -xzf "$SRC_FILE"
+        return 0
+    fi
+
+    return 1
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"
@@ -66,7 +92,10 @@ ok "Node.js $(node -v) installed"
 step "Downloading HydraPanel"
 [[ -d "$INSTALL_DIR" ]] && rm -rf "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
-git clone --depth 1 https://github.com/marwanbd83487/HydraPanel.git "$INSTALL_DIR"
+cd "$INSTALL_DIR"
+if ! download_src; then
+    git clone --depth 1 https://github.com/marwanbd83487/HydraPanel.git "$INSTALL_DIR"
+fi
 ok "Panel cloned"
 
 step "Installing npm dependencies"

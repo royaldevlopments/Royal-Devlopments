@@ -12,6 +12,35 @@ HEADER_LINE="${GRAY}────────────────────
 GITHUB_REPO="Paymenter/Paymenter"
 PHP_VERSION="8.3"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="paymenter.tar.gz"
+    local LOCAL_PATH="$BASE_DIR/src/paymentar/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" ./
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/paymentar/$SRC_FILE" -o "$SRC_FILE" 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Trying upstream release...${NC}"
+    if [[ "$version_PANEL" == "latest" ]]; then
+        curl -Lso "$SRC_FILE" "https://github.com/$GITHUB_REPO/releases/latest/download/$SRC_FILE"
+    else
+        curl -Lso "$SRC_FILE" "https://github.com/$GITHUB_REPO/releases/download/${version_PANEL}/$SRC_FILE"
+    fi
+}
+
 show_banner() {
     clear
     echo -e "${GOLD}"
@@ -117,13 +146,8 @@ curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
 
 mkdir -p /var/www/paymenter
 cd /var/www/paymenter
-if [[ "$version_PANEL" == "latest" ]]; then
-    step "Downloading latest panel release..."
-    curl -Lso paymenter.tar.gz https://github.com/Paymenter/Paymenter/releases/latest/download/paymenter.tar.gz
-else
-    step "Downloading panel version $version_PANEL..."
-    curl -Lso paymenter.tar.gz "https://github.com/Paymenter/Paymenter/releases/download/${version_PANEL}/paymenter.tar.gz"
-fi
+step "Downloading panel source..."
+download_src
 tar -xzf paymenter.tar.gz
 chmod -R 755 storage/* bootstrap/cache/
 

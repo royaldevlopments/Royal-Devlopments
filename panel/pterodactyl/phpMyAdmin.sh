@@ -4,6 +4,32 @@ CYAN='\033[38;5;51m'; PURPLE='\033[38;5;141m'; GRAY='\033[38;5;242m'
 WHITE='\033[38;5;255m'; GREEN='\033[38;5;82m'; RED='\033[38;5;196m'; GOLD='\033[38;5;214m'; NC='\033[0m'
 HEADER_LINE="${GRAY}────────────────────────────────────────────────────────────${NC}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="phpmyadmin.tar.gz"
+    local LOCAL_PATH="$BASE_DIR/src/phpmyadmin/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" ./phpMyAdmin.tar.gz
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/phpmyadmin/$SRC_FILE" -o phpMyAdmin.tar.gz 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Trying upstream...${NC}"
+step "Downloading phpMyAdmin..."
+download_src
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"

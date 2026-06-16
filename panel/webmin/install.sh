@@ -10,6 +10,38 @@ GOLD='\033[38;5;214m'
 NC='\033[0m'
 HEADER_LINE="${GRAY}────────────────────────────────────────────────────────────${NC}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="$1"
+    local LOCAL_PATH="$BASE_DIR/src/webmin/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        if [[ "$SRC_FILE" == *.sh ]]; then
+            bash "$LOCAL_PATH"
+        else
+            cp "$LOCAL_PATH" ./
+        fi
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if [[ "$SRC_FILE" == *.sh ]]; then
+        local REMOTE_SCRIPT
+        REMOTE_SCRIPT=$(curl -sL "$GITHUB_RAW/src/webmin/$SRC_FILE" 2>/dev/null)
+        if [ -n "$REMOTE_SCRIPT" ]; then
+            ok "Running from GitHub raw"
+            bash -c "$REMOTE_SCRIPT"
+            return 0
+        fi
+    fi
+    return 1
+}
+
 show_banner() {
     clear
     echo -e "${GREEN}"
@@ -46,15 +78,19 @@ echo -e "${HEADER_LINE}"
 
 if [ "$choice" = "1" ]; then
     step "Installing Webmin..."
-    curl -fsSL https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh | bash
+    if ! download_src "setup-repos.sh"; then
+        curl -fsSL https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh | bash
+    fi
     apt update && apt install -y webmin
     echo -e "${HEADER_LINE}"
     echo -e "\n  ${CYAN}WEBMIN INSTALLED${NC}"
     echo -e "  ${GRAY}URL :${NC} ${WHITE}https://$(hostname -I | awk '{print $1}'):10000${NC}"
 else
     step "Installing Virtualmin..."
-    wget -qN https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh
-    bash virtualmin-install.sh
+    if ! download_src "virtualmin-install.sh"; then
+        wget -qN https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh
+        bash virtualmin-install.sh
+    fi
     echo -e "${HEADER_LINE}"
     echo -e "\n  ${CYAN}VIRTUALMIN INSTALLED${NC}"
     echo -e "  ${GRAY}URL :${NC} ${WHITE}https://$(hostname -I | awk '{print $1}'):10000${NC}"

@@ -12,6 +12,31 @@ HEADER_LINE="${GRAY}────────────────────
 INSTALL_DIR="/var/www/reviactyl"
 PHP_VERSION="8.3"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="panel.tar.gz"
+    local LOCAL_PATH="$BASE_DIR/src/reviactyl/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" ./
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/reviactyl/$SRC_FILE" -o "$SRC_FILE" 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Trying upstream release...${NC}"
+    curl -Lo "$SRC_FILE" "https://github.com/reviactyl/panel/releases/latest/download/$SRC_FILE"
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"
@@ -94,7 +119,7 @@ ok "Database created"
 step "Downloading Reviactyl panel"
 mkdir -p "$INSTALL_DIR"
 cd "$INSTALL_DIR"
-curl -Lo panel.tar.gz https://github.com/reviactyl/panel/releases/latest/download/panel.tar.gz
+download_src
 tar -xzf panel.tar.gz
 chmod -R 755 storage/* bootstrap/cache/
 ok "Panel files downloaded"

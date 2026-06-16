@@ -13,6 +13,31 @@ INSTALL_DIR="/opt/catalyst-docker"
 REPO="catalystctl/catalyst"
 BRANCH="main"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="catalyst.tar.gz"
+    local LOCAL_PATH="$BASE_DIR/src/catalyst/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        cp "$LOCAL_PATH" /tmp/catalyst.tar.gz
+        ok "Copied from local repo"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    if curl -sL "$GITHUB_RAW/src/catalyst/$SRC_FILE" -o /tmp/catalyst.tar.gz 2>/dev/null; then
+        ok "Downloaded from GitHub raw"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Trying upstream archive...${NC}"
+    curl -fsSL "https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz" -o /tmp/catalyst.tar.gz
+}
+
 show_banner() {
     clear
     echo -e "${CYAN}"
@@ -61,7 +86,7 @@ else
 fi
 
 step "Downloading Catalyst..."
-curl -fsSL "https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz" -o /tmp/catalyst.tar.gz
+download_src
 rm -rf "$INSTALL_DIR" /tmp/catalyst-extract
 mkdir -p /tmp/catalyst-extract
 tar -xzf /tmp/catalyst.tar.gz -C /tmp/catalyst-extract --strip-components=1 "${REPO#*/}-${BRANCH}/catalyst-docker/"

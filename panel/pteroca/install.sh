@@ -10,6 +10,35 @@ GOLD='\033[38;5;214m'
 NC='\033[0m'
 HEADER_LINE="${GRAY}────────────────────────────────────────────────────────────${NC}"
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+PANEL_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(dirname "$PANEL_DIR")"
+GITHUB_RAW="https://raw.githubusercontent.com/royaldevlopments/Royal-Devlopments/main"
+
+download_src() {
+    local SRC_FILE="installer.sh"
+    local LOCAL_PATH="$BASE_DIR/src/pteroca/$SRC_FILE"
+
+    if [ -f "$LOCAL_PATH" ]; then
+        ok "Running from local repo"
+        bash "$LOCAL_PATH"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Local source not found. Trying GitHub raw...${NC}"
+    local REMOTE_SCRIPT
+    REMOTE_SCRIPT=$(curl -sL "$GITHUB_RAW/src/pteroca/$SRC_FILE" 2>/dev/null)
+    if [ -n "$REMOTE_SCRIPT" ]; then
+        ok "Running from GitHub raw"
+        bash -c "$REMOTE_SCRIPT"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}Trying upstream...${NC}"
+step "Downloading PteroCA installer..."
+download_src
+}
+
 echo -e "${GOLD}"
 cat << "EOF"
    ____  _                    ____    _
