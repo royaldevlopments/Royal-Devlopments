@@ -4,6 +4,9 @@
 # ==========================================================
 set -euo pipefail
 
+# Redirect to /dev/tty so countdown shows in real-time (no buffering)
+[ -c /dev/tty ] && exec > /dev/tty 2>&1
+
 # --- ROYAL THEME ---
 R='\033[1;38;5;196m'
 G='\033[1;38;5;82m'
@@ -88,11 +91,11 @@ if curl -fsSL -A "Royal-Uplink-Agent" -o "$payload" "$GITHUB_RAW/installer.sh"; 
     echo -e "\n${DG}──────────────────────────────────────────────────────────────────────────────${NC}"
     echo -e " ${P}✦✦✦ UPLINK ESTABLISHED — EXECUTING PAYLOAD IN 10 SECONDS ✦✦✦${NC}\n"
 
-    echo -ne " ${W}Initiating in${NC}"
     for i in 10 9 8 7 6 5 4 3 2 1; do
-        echo -ne " ${R}$i${NC} " ; sleep 0.8
+        printf "\r ${W}Initiating in ${R}%2d${NC} " "$i" > /dev/tty
+        sleep 1
     done
-    echo -e "\n"
+    echo -e "\n" > /dev/tty
 
     bash "$payload"
 else
