@@ -44,14 +44,35 @@ render_ui() {
     echo -e " ${B_BLUE}${NC}${BG_SHADE}${W} $CURRENT_HOST ${NC}${B_BLUE}${NC}  ${B_PURPLE}${NC}${BG_SHADE}${W} $UPT ${NC}${B_PURPLE}${NC}  ${B_GREEN}${NC}${BG_SHADE}${W} $DISK ${NC}${B_GREEN}${NC}  ${B_CYAN}${NC}${BG_SHADE}${W} CPU ${CPU}% RAM ${RAM}%${NC}${B_CYAN}${NC}"
     echo ""
 
-    echo -e "${B_CYAN}██████  ███████ █     █    █    █          ██████  ███████ █     █ ███████ █       ███████ ██████  █     █ ███████ █     █ ███████  █████  ${NC}"
-    echo -e "${B_CYAN}█     █ █     █  █   █    █ █   █          █     █ █       █     █ █       █       █     █ █     █ ██   ██ █       ██    █    █    █     █ ${NC}"
-    echo -e "${B_PURPLE}█     █ █     █   █ █    █   █  █          █     █ █       █     █ █       █       █     █ █     █ █ █ █ █ █       █ █   █    █    █       ${NC}"
-    echo -e "${B_PURPLE}██████  █     █    █    █     █ █          █     █ █████   █     █ █████   █       █     █ ██████  █  █  █ █████   █  █  █    █     █████  ${NC}"
-    echo -e "${GOLD}█   █   █     █    █    ███████ █          █     █ █        █   █  █       █       █     █ █       █     █ █       █   █ █    █          █ ${NC}"
-    echo -e "${GOLD}█    █  █     █    █    █     █ █          █     █ █         █ █   █       █       █     █ █       █     █ █       █    ██    █    █     █ ${NC}"
-    echo -e "${B_CYAN}█     █ ███████    █    █     █ ███████    ██████  ███████    █    ███████ ███████ ███████ █       █     █ ███████ █     █    █     █████  ${NC}"
-    echo -e "                  ${G}ROYAL DEVELOPMENTS — OBSIDIAN NEXT GEN${NC}"
+    local WIDTH=$(tput cols 2>/dev/null || echo 80)
+    if [ "$WIDTH" -ge 139 ]; then
+        echo -e "${B_CYAN}██████  ███████ █     █    █    █          ██████  ███████ █     █ ███████ █       ███████ ██████  █     █ ███████ █     █ ███████  █████  ${NC}"
+        echo -e "${B_CYAN}█     █ █     █  █   █    █ █   █          █     █ █       █     █ █       █       █     █ █     █ ██   ██ █       ██    █    █    █     █ ${NC}"
+        echo -e "${B_PURPLE}█     █ █     █   █ █    █   █  █          █     █ █       █     █ █       █       █     █ █     █ █ █ █ █ █       █ █   █    █    █       ${NC}"
+        echo -e "${B_PURPLE}██████  █     █    █    █     █ █          █     █ █████   █     █ █████   █       █     █ ██████  █  █  █ █████   █  █  █    █     █████  ${NC}"
+        echo -e "${GOLD}█   █   █     █    █    ███████ █          █     █ █        █   █  █       █       █     █ █       █     █ █       █   █ █    █          █ ${NC}"
+        echo -e "${GOLD}█    █  █     █    █    █     █ █          █     █ █         █ █   █       █       █     █ █       █     █ █       █    ██    █    █     █ ${NC}"
+        echo -e "${B_CYAN}█     █ ███████    █    █     █ ███████    ██████  ███████    █    ███████ ███████ ███████ █       █     █ ███████ █     █    █     █████  ${NC}"
+        echo -e "                  ${G}ROYAL DEVELOPMENTS — OBSIDIAN NEXT GEN${NC}"
+    elif [ "$WIDTH" -ge 67 ]; then
+        echo -e "${B_CYAN}██████  ███████ █     █    █    █          ██████  ███████ █     █ ${NC}"
+        echo -e "${B_CYAN}█     █ █     █  █   █    █ █   █          █     █ █       █     █ ${NC}"
+        echo -e "${B_PURPLE}█     █ █     █   █ █    █   █  █          █     █ █       █     █ ${NC}"
+        echo -e "${B_PURPLE}██████  █     █    █    █     █ █          █     █ █████   █     █ ${NC}"
+        echo -e "${GOLD}█   █   █     █    █    ███████ █          █     █ █        █   █  ${NC}"
+        echo -e "${GOLD}█    █  █     █    █    █     █ █          █     █ █         █ █   ${NC}"
+        echo -e "${B_CYAN}█     █ ███████    █    █     █ ███████    ██████  ███████    █    ${NC}"
+        echo -e "                  ${G}ROYAL DEV${NC}"
+    else
+        echo -e "${B_CYAN}██████  ███████ █     █    █    █       ${NC}"
+        echo -e "${B_CYAN}█     █ █     █  █   █    █ █   █       ${NC}"
+        echo -e "${B_PURPLE}█     █ █     █   █ █    █   █  █       ${NC}"
+        echo -e "${B_PURPLE}██████  █     █    █    █     █ █       ${NC}"
+        echo -e "${GOLD}█   █   █     █    █    ███████ █       ${NC}"
+        echo -e "${GOLD}█    █  █     █    █    █     █ █       ${NC}"
+        echo -e "${B_CYAN}█     █ ███████    █    █     █ ███████${NC}"
+        echo -e "                  ${G}ROYAL${NC}"
+    fi
 
     echo -e " ${G}────────────────────────────────────────────────────────────────────────────────${NC}"
     echo ""
